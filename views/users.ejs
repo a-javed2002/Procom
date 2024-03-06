@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <style>
+        *,
+        *:after,
+        *:before {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: arial;
+            font-size: 16px;
+            margin: 0;
+            background: #fff;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>User List</h1>
+        <% if (userss.length === 0) { %>
+            <p>No users found.</p>
+        <% } else { %>
+        <table id="example" class="display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Account No</th>
+                    <th>Phone No</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% userss.forEach(user => { %>
+                <tr>
+                    <td><input type="checkbox" class="row-checkbox" name="selectedIds[]" value="<%= user._id %>"></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.AccountNo %></td>
+                    <td><%= user.PhoneNo %></td>
+                    <td><%= user.date %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Account No</th>
+                    <th>Phone No</th>
+                    <th>Date</th>
+                </tr>
+            </tfoot>
+        </table>
+        <% } %>
+
+    </div>
+
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/select/2.0.0/js/select.dataTables.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+
+            // Handle row selection
+            $('#example tbody').on('change', '.row-checkbox', function () {
+                $(this).closest('tr').toggleClass('selected');
+            });
+        });
+    </script>
+</body>
+
+</html>

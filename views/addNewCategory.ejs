@@ -1,0 +1,83 @@
+<%- include('header') %>
+              <div class="container">
+                    <div class="row">
+   
+                        <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <div class="panel-title"> Add New Password Category</div>
+                                     </div>  
+                                <div class="panel-body" >
+                                    <form action="/add-new-category" id="EmployeeForm" class="form-horizontal" method="post"  role="form">
+                                      
+                                        <div class="form-group">
+                                          <% if(errors !=''){%>
+                                          <p style="text-align: center;color:red;"><%= errors.passwordCategory.msg %></p>
+                                            <% } %>
+
+                                            <% if(success !=''){%>
+                                              <p style="text-align: center;color:green;"><%= success %></p>
+                                                <% } %>
+                                            <label for="username" class="col-md-3 control-label">Category Name</label>
+                                            <div class="col-md-9">
+                                                <input type="text" id="searchName" class="form-control" name="passwordCategory" placeholder="Enter YourPassword Category Name">
+                                            </div>
+                                        </div>
+                                       
+                                        <div class="form-group">
+                                            <!-- Button -->                                        
+                                            <div class="col-md-offset-3 col-md-9">
+                                            <input type="submit" name="submit" value="Add Category" class="btn btn-primary">   
+                                            </div>
+                                        </div>
+                                        
+                                        <p><a href="/passwordCategory">View All Category Lists</a></p>
+                                         
+                                        
+                                        
+                                        
+                                    </form>
+                                 </div>
+                            </div>
+                
+                       
+                       
+                        
+                 </div> 
+                    </div>
+                  </div>
+                  <!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include jQuery UI library for Autocomplete -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+$(function () {
+    $('#searchName').autocomplete({
+        source: function (req, res) {
+            $.ajax({
+                url: "autocomplete/",
+                dataType: "jsonp",
+                type: "GET",
+                data: req,
+                success: function (data) {
+                    res(data);
+                },
+                error: function (err) {
+                    console.log(err.status);
+                }
+            });
+        },
+
+        minLength: 1,
+        select: function (event, ui) {
+            if (ui.item) {
+                $('#searchName').val(ui.item.label); // Use val() to set input value
+            }
+        }
+    });
+});
+</script>
+
+                  <%- include('footer') %>

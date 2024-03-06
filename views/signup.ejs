@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/stylesheets/international-telephone-input.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  
+  <style>
+    /* Set full height for the body and html */
+    html,
+    body {
+      height: 100%;
+    }
+
+    /* Set full height for the container, and flex to stack items */
+
+
+    /* Style the left and right divs */
+    .left-div,
+    .right-div {
+      height: 100%;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      min-height: 100vh;
+      /* Set minimum height to 100% of viewport height */
+    }
+
+    /* Set background colors for the left and right divs */
+    .left-div {
+      /* background-color: #007bff; */
+      /* min-width: 50vw; */
+      /* Bootstrap primary color */
+    }
+
+    .right-div {
+      /* background-color: #28a745; */
+      /* min-width: 50vw; */
+      /* Bootstrap success color */
+    }
+  </style>
+
+</head>
+<style>
+  ul {
+    top: 100% !important;
+    transform: translateY(0%) !important;
+  }
+
+  .iti {
+    position: relative;
+    display: inline-block;
+  }
+
+  input[type=tel] {
+    padding-right: 6px;
+    padding-left: 52px;
+    margin-left: 0;
+
+    position: relative;
+    z-index: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-right: 0;
+    border: 1px solid #CCC;
+    width: 270px;
+    height: 35px;
+    /* padding: 6px 12px; */
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: 100%;
+    color: inherit;
+  }
+
+  button {
+    color: #FFF;
+    background-color: #428BCA;
+    border: 1px solid #357EBD;
+    height: 39px;
+    margin: 0;
+    padding: 6px 20px;
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: 100%;
+  }
+
+  button:hover {
+    background-color: #3276B1;
+    border-color: #285E8E;
+    cursor: pointer;
+  }
+</style>
+<body>
+  <div class="container">
+    <div class="row">
+      <h2 class="text-center">
+        <%= title %>
+      </h2>
+      <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <div class="panel-title"> Signup</div>
+          </div>
+          <div class="panel-body">
+            <% if(msg !='' ){ %>
+              <p style="text-align: center" class="<%= status ? 'success' : 'failure' %>">
+                <%= msg %>
+              </p>
+              <% } %>
+                <form action="/signup" id="EmployeeForm" class="form-horizontal" method="post" role="form">
+
+                  <div id="signupalert" style="display:none" class="alert alert-danger">
+                    <p>Error:</p>
+                    <span></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="username" class="col-md-3 control-label">User Name</label>
+                    <div class="col-md-9">
+                      <input type="text" class="form-control" name="uname" value="<%= input.uname %>"
+                        placeholder="Enter Your User Name" required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="acc" class="col-md-3 control-label">Acc. No</label>
+                    <div class="col-md-9">
+                      <input type="text" class="form-control" name="AccountNo" value="<%= input.AccountNo %>"
+                        placeholder="Enter Your Acc">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="tel" class="col-md-3 control-label">Phone Number</label>
+                    <div class="col-md-9">
+                      <div class="iti">
+                        <input type="tel" name="PhoneNo" class="form-control" value="<%= input.PhoneNo %>"
+                          placeholder="Enter Your Phone No">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="email" class="col-md-3 control-label">Email</label>
+                    <div class="col-md-9">
+                      <input type="text" class="form-control" name="email" value="<%= input.email %>"
+                        placeholder="Enter Your Email" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="password" class="col-md-3 control-label">Password</label>
+                    <div class="col-md-9">
+                      <input type="password" class="form-control" name="password" placeholder="Enteryour password"
+                        required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="confpassword" class="col-md-3 control-label">Confirm Password</label>
+                    <div class="col-md-9">
+                      <input type="password" class="form-control" name="confpassword"
+                        placeholder="Enteryour Confirm Password" required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <!-- Button -->
+                    <div class="col-md-offset-3 col-md-9">
+                      <input type="submit" name="submit" value="Signup" class="btn btn-primary">
+                    </div>
+                  </div>
+
+                  <p>Already have account? <a href="/">Login Here</a></p>
+                </form>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</body>
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="/javascripts/international-telephone-input.js"></script>
+
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .form-group button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Payment Request For Customer</h2>
+        <form action="/merchant/payments" method="POST">
+            <div class="form-group">
+                <label for="cust_name">Customer Name:</label>
+                <input type="text" id="cust_name" name="cust_name" required>
+            </div>
+            <div class="form-group">
+                <label for="cust_email">Customer Email Address (Optional):</label>
+                <input type="email" id="cust_email" name="cust_email">
+            </div>
+            <div class="form-group">
+                <label for="cust_acc">Customer Account:</label>
+                <input type="text" id="cust_acc" name="cust_acc" required>
+            </div>
+            <div class="form-group">
+                <label for="mer_acc">Merchant Account:</label>
+                <input type="text" id="mer_acc" name="mer_acc" required>
+            </div>
+            <div class="form-group">
+                <label for="status">Select Bank:</label>
+                <select id="status" name="bank" required>
+                    <option value="Bank Al-Habib">Bank Al-Habib</option>
+                    <option value="Alfalah Bank">Alfalah Bank</option>
+                    <option value="Faysal Bank">Faysal Bank</option>
+                    <option value="HBL Bank">HBL Bank</option>
+                    <option value="Meezan Bank">Meezan Bank</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="desc">Payment Purpose:</label>
+                <input type="text" id="desc" name="desc" required>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
