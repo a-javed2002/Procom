@@ -152,7 +152,8 @@ router.get('/payments', checkLoginMerchant, async function (req, res, next) {
       totalRecordsReject: totalRecordsReject,
       sumPendingAmounts: sumPendingAmounts,
       sumPayAmounts: sumPayAmounts,
-      sumRejectAmounts: sumRejectAmounts
+      sumRejectAmounts: sumRejectAmounts,
+      msg:""
     });
   } catch (error) {
     console.error('Error fetching payments:', error);
@@ -176,7 +177,38 @@ async function generateQR(text) {
   }
 }
 
-router.post('/payments', checkLoginMerchant, async function (req, res, next) {
+// Middleware to check if account number exists in the database
+function checkAccountNo(req, res, next) {
+  const loginUser = localStorage.getItem('loginUser');
+  const userAcc = localStorage.getItem('userAcc');
+  var acc = req.body.cust_acc;
+  var checkExistingAccount = transactionModel.findOne({ cust_acc: acc });
+
+  checkExistingAccount.exec((err, data) => {
+    if (err) {
+      console.error('Error checking account:', err);
+      return res.status(500).send('Internal Server Error');
+    }
+
+    if (!data) {
+      // If account does not exist, render a message or redirect
+      return res.render('create', {
+        title: 'PayHabib',
+        msg: 'Customer Account Does Not Found',
+        status: false,
+        loginUser:loginUser,
+        merAcc:userAcc,
+        input: { uname: req.body.uname, email: req.body.email, }
+      });
+    }
+
+    // If account exists, proceed to the next middleware or route handler
+    next();
+  });
+}
+
+
+router.post('/payments', checkLoginMerchant, checkAccountNo, async function (req, res, next) {
   const { cust_acc, mer_acc, desc, amount, cust_name, cust_email, bank } = req.body;
 
   const userRole = localStorage.getItem('userRole');
@@ -194,8 +226,8 @@ router.post('/payments', checkLoginMerchant, async function (req, res, next) {
     bank: bank,
     desc: desc,
     amount: amount,
-    date : dateTime.toLocaleDateString(),
-    time : dateTime.toLocaleTimeString()
+    date: dateTime.toLocaleDateString(),
+    time: dateTime.toLocaleTimeString()
   });
 
   try {
@@ -285,7 +317,7 @@ router.get('/create', checkLoginMerchant, function (req, res, next) {
   if (userRole != 0) {
     res.redirect('/merchant');
   }
-  res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '',merAcc:userAcc });
+  res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '', merAcc: userAcc ,msg:""});
 
 });
 
