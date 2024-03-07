@@ -61,11 +61,20 @@ router.post('/', function (req, res, next) {
         localStorage.setItem('userToken', token);
         localStorage.setItem('loginUser', username);
         localStorage.setItem('userID', getUserID);
+        localStorage.setItem('userRole', getUserRole);
         localStorage.setItem('userAcc', getUserAcc);
-        res.redirect('/dashboard');
+        if(getUserRole==0){
+          res.redirect('/merchant/dashboard');
+        }else{
+          res.redirect('/payments');
+        }
       } else {
         //password does,not match 
-        res.render('login', { title: 'PayHabib', msg: "Invalid Username and Password." });
+        if(getUserRole==0){
+          res.render('merchantLogin', { title: 'PayHabib', msg: "Invalid Username and Password." });
+        }else{
+          res.render('login', { title: 'PayHabib', msg: "Invalid Username and Password." });
+        }
       }
     }
   });
@@ -195,21 +204,29 @@ router.post('/signup', checkPassword, checkUsername, checkAccountNo, checkEmail,
   });
   userDetails.save((err, doc) => {
     if (err) throw err;
-    res.render('signup', { title: 'PayHabib', msg: 'User Registered Successfully', status: true, input: { uname: '', email: '' } });
+    // Redirect to login page after successful signup
+    res.redirect('/');
   });
-
-
 });
 
 router.get('/logout', function (req, res, next) {
+  const userRole = localStorage.getItem('userRole');
+    
   localStorage.removeItem('userToken');
   localStorage.removeItem('loginUser');
+  if(userRole!=1){
+    res.redirect('/merchant');
+    }
   res.redirect('/');
 });
 
 
 router.get('/payments', checkLoginUser, function (req, res, next) {
   const loginUser = localStorage.getItem('loginUser');
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=1){
+    res.redirect('/merchant');
+    }
   var getUserID = localStorage.getItem('userID');
   var getuserAcc = localStorage.getItem('userAcc');
   transactionModel.find({ cust_acc: getuserAcc }, function (err, payments) {
@@ -246,6 +263,10 @@ router.get('/paymentDetail/pay/:id', checkLoginUser, function (req, res, next) {
   const paymentId = req.params.id;
   var getuserAcc = localStorage.getItem('userAcc');
 
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=1){
+    res.redirect('/merchant');
+    }
 
   // Assuming you're using Mongoose
   transactionModel.findById(paymentId, function (err, payment) {
@@ -286,6 +307,12 @@ router.post('/pay', checkLoginUser, function (req, res, next) {
   const loginUser = localStorage.getItem('loginUser');
   const { paymentId } = req.body;
 
+  
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=1){
+    res.redirect('/merchant');
+    }
+
   // Update the status of the payment
   transactionModel.findByIdAndUpdate(paymentId, { status: 'Pay' }, { new: true }, function (err, updatedPayment) {
     if (err) {
@@ -301,6 +328,11 @@ router.post('/pay', checkLoginUser, function (req, res, next) {
 });
 
 router.get('/reject', checkLoginUser, function (req, res, next) {
+  
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=1){
+    res.redirect('/merchant');
+    }
   const loginUser = localStorage.getItem('loginUser');
   const { paymentId } = req.body;
 
@@ -320,6 +352,10 @@ router.get('/reject', checkLoginUser, function (req, res, next) {
 
 
 router.get('/upload', checkLoginUser, function (req, res, next) {
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=1){
+    res.redirect('/merchant');
+    }
   var loginUser = localStorage.getItem('loginUser');
 
   res.render('uploads', { title: 'PayHabib', loginUser: loginUser, errors: '', success: '' });

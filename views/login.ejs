@@ -105,6 +105,38 @@
   }
 </style>
 
+<style>
+
+  .form-group {
+      margin-bottom: 20px;
+  }
+
+  .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="number"],
+  .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+  }
+
+  .form-group button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+  }
+</style>
+
 <body style="max-width: 97%;">
   <div class="row">
     <!-- Left Div -->
@@ -121,15 +153,15 @@
             <img src="/images/logo.png" alt="" width="75px" height="75px">
           </div>
           <div style="margin-left: 30px">
-            <h3>Create</h3>
+            <h3>Login</h3>
             <h3><span style="color: #79dafa;">Customer Portal </span><span>Account</span></h3>
           </div>
         </div>
         <div class="mainbox col-12 " style="margin: 0px 20px 0px 10px;">
           <div class="panel panel-info">
-            <div class="panel-heading">
+            <!-- <div class="panel-heading">
               <div class="panel-title"> Login</div>
-            </div>
+            </div> -->
             <div class="panel-body">
               <form action="/" id="EmployeeForm" class="form-horizontal" method="post" role="form">
                 <% if(msg !='' ){ %>
@@ -140,14 +172,14 @@
                   </div>
                   <% } %>
                     <div class="form-group">
-                      <label for="username" class="col-md-3 control-label">User Name</label>
+                      <label for="username" class="col-md-3 control-label">UserName:</label>
                       <div class="col-md-9">
                         <input type="text" class="form-control" name="uname" placeholder="Enter Your User Name">
                       </div>
                     </div>
 
                     <div class="form-group">
-                      <label for="password" class="col-md-3 control-label">Password</label>
+                      <label for="password" class="col-md-3 control-label">Password:</label>
                       <div class="col-md-9">
                         <input type="password" class="form-control" name="password" placeholder="Enteryour password">
                       </div>
@@ -156,10 +188,10 @@
                     <div class="form-group">
                       <!-- Button -->
                       <div class="col-md-offset-3 col-md-9">
-                        <input type="submit" name="submit" value="login" class="btn btn-primary">
+                        <input type="submit" name="submit" value="login" class="form-control" style="background-color: #79dafa;color: white;font-weight: bolder;">
                       </div>
                     </div>
-                    <p>If you don't have account <a href="/signup">Create New Acoount</a></p>
+                    <p style="font-size: 15px;">If you don't have account? <a href="/signup" style="color: #79dafa;">Create New Acoount</a></p>
 
               </form>
             </div>

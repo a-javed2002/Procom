@@ -11,12 +11,16 @@ const nodemailer = require('nodemailer');
 
 
 
-function checkLoginUser(req, res, next) {
+function checkLoginMerchant(req, res, next) {
   var userToken = localStorage.getItem('userToken');
   try {
     var decoded = jwt.verify(userToken, 'loginToken');
+    // const userRole = localStorage.getItem('userRole');
+    // if(userRole!=0){
+    // res.redirect('/merchant');
+    // }
   } catch (err) {
-    res.redirect('/');
+    res.redirect('/merchant');
   }
   next();
 }
@@ -26,57 +30,144 @@ if (typeof localStorage === "undefined" || localStorage === null) {
   localStorage = new LocalStorage('./scratch');
 }
 
-router.get('/', checkLoginUser, function (req, res, next) {
+router.get('/dashboard',checkLoginMerchant, function(req, res, next) {
+  var loginUser=localStorage.getItem('loginUser');
+  var getuserAcc = localStorage.getItem('userAcc');
+  res.render('dashboard', { title: 'PayHabib',loginUser: loginUser,errors:'',success:'' });
+  });
+
+router.get('/', function (req, res, next) {
   var loginUser = localStorage.getItem('loginUser');
   passModel.countDocuments({}).exec((err, count) => {
     passCatModel.countDocuments({}).exec((err, countasscat) => {
-      res.render('dashboard', { title: 'PayHabib', loginUser: loginUser, msg: '', totalPassword: count, totalPassCat: countasscat });
+      res.render('merchantLogin', { title: 'PayHabib', loginUser: loginUser, msg: '', totalPassword: count, totalPassCat: countasscat });
     });
   });
 });
 
 
-router.get('/users', checkLoginUser, function (req, res, next) {
-  const loginUser = localStorage.getItem('loginUser');
-  userModule.find({}, function (err, user) {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error fetching categories');
-    } else {
-      res.render('users', { title: 'List of Users', loginUser: loginUser, userss: user });
+// router.get('/users', checkLoginMerchant, function (req, res, next) {
+//   const loginUser = localStorage.getItem('loginUser');
+//   const userRole = localStorage.getItem('userRole');
+//   const acc = localStorage.getItem('userAcc');
+//     if(userRole!=0){
+//     res.redirect('/merchant');
+//     }
+//   userModule.find({}, function (err, user) {
+//     if (err) {
+//       console.error(err);
+//       res.status(500).send('Error fetching categories');
+//     } else {
+//       res.render('users', { title: 'List of Users', loginUser: loginUser, userss: user });
+//     }
+//   });
+// });
+
+router.get('/users', checkLoginMerchant, async function (req, res, next) {
+  try {
+    const loginUser = localStorage.getItem('loginUser');
+    const userRole = localStorage.getItem('userRole');
+    const acc = localStorage.getItem('userAcc');
+
+    if (userRole != 0) {
+      res.redirect('/merchant');
     }
-  });
+
+    console.log(acc);
+
+    // Fetch users whose account number matches in transactions
+    const users = await userModule.aggregate([
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "AccountNo",
+          foreignField: "mer_acc",
+          as: "transactions"
+        }
+      },
+      {
+        $match: {
+          "transactions.mer_acc": acc
+        }
+      }
+    ]);
+
+    // Render the view with filtered user data
+    res.render('users', { title: 'List of Users', loginUser: loginUser, userss: users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    // Handle error appropriately, e.g., render an error page
+    next(error);
+  }
 });
 
-router.get('/payments', checkLoginUser, function (req, res, next) {
-  const loginUser = localStorage.getItem('loginUser');
-  transactionModel.find({}, function (err, payments) {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error fetching payments');
-    } else {
-      // Preprocess the payments data
-      const processedPayments = payments.map(payment => {
-        const dateTime = new Date(payment.date);
-        const properDate = dateTime.toLocaleDateString();
-        const properTime = dateTime.toLocaleTimeString();
 
-        return {
-          ...payment.toObject(), // Convert Mongoose document to plain object
-          properDate: properDate,
-          properTime: properTime
-        };
-      });
-
-      // Render the view with processed payments data
-      res.render('payments', {
-        title: 'Payments',
-        loginUser: loginUser,
-        payments: processedPayments
-      });
+router.get('/payments', checkLoginMerchant, async function(req, res, next) {
+  try {
+    const loginUser = localStorage.getItem('loginUser');
+    const userRole = localStorage.getItem('userRole');
+    const acc = localStorage.getItem('userAcc');
+    if (userRole != 0) {
+      res.redirect('/merchant');
     }
-  });
+
+    // Find all transactions
+    const payments = await transactionModel.find({mer_acc:acc});
+
+    // Calculate the total number of records
+    const totalRecords = payments.length;
+
+    // Filter payments based on status and calculate the total records for each status
+    const totalRecordsPending = payments.filter(payment => payment.status === 'Pending').length;
+    const totalRecordsPay = payments.filter(payment => payment.status === 'Pay').length;
+    const totalRecordsReject = payments.filter(payment => payment.status === 'Reject').length;
+
+    // Calculate the total sum of payments
+    const totalPayments = payments.reduce((total, payment) => total + payment.amount, 0);
+
+    // Calculate the sum of amounts for each type of transaction
+    const sumPendingAmounts = payments.reduce((total, payment) => {
+      if (payment.status === 'Pending') {
+        return total + payment.amount;
+      }
+      return total;
+    }, 0);
+
+    const sumPayAmounts = payments.reduce((total, payment) => {
+      if (payment.status === 'Pay') {
+        return total + payment.amount;
+      }
+      return total;
+    }, 0);
+
+    const sumRejectAmounts = payments.reduce((total, payment) => {
+      if (payment.status === 'Reject') {
+        return total + payment.amount;
+      }
+      return total;
+    }, 0);
+
+    // Render the view with processed payments data
+    res.render('payments', {
+      title: 'Payments',
+      payments: payments,
+      loginUser: loginUser,
+      totalRecords: totalRecords,
+      totalPayments: totalPayments,
+      totalRecordsPending: totalRecordsPending,
+      totalRecordsPay: totalRecordsPay,
+      totalRecordsReject: totalRecordsReject,
+      sumPendingAmounts: sumPendingAmounts,
+      sumPayAmounts: sumPayAmounts,
+      sumRejectAmounts: sumRejectAmounts
+    });
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    // Handle error appropriately, e.g., render an error page
+    next(error);
+  }
 });
+
 
 
 
@@ -92,8 +183,13 @@ async function generateQR(text) {
   }
 }
 
-router.post('/payments', checkLoginUser, async function (req, res, next) {
+router.post('/payments', checkLoginMerchant, async function (req, res, next) {
   const { cust_acc, mer_acc, desc, amount, cust_name, cust_email, bank } = req.body;
+
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=0){
+    res.redirect('/merchant');
+    }
 
   // Assuming transactionModel is your Mongoose model for transactions
   const newTransaction = new transactionModel({
@@ -163,8 +259,12 @@ router.post('/payments', checkLoginUser, async function (req, res, next) {
 });
 
 
-router.get('/create', checkLoginUser, function (req, res, next) {
+router.get('/create', checkLoginMerchant, function (req, res, next) {
   const loginUser = localStorage.getItem('loginUser');
+  const userRole = localStorage.getItem('userRole');
+    if(userRole!=0){
+    res.redirect('/merchant');
+    } 
   res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '' });
 
 });
