@@ -28,10 +28,74 @@ if (typeof localStorage === "undefined" || localStorage === null) {
   localStorage = new LocalStorage('./scratch');
 }
 
-router.get('/dashboard', checkLoginMerchant, function (req, res, next) {
-  var loginUser = localStorage.getItem('loginUser');
-  var getuserAcc = localStorage.getItem('userAcc');
-  res.render('dashboard', { title: 'PayHabib', loginUser: loginUser, errors: '', success: '' });
+router.get('/dashboard', checkLoginMerchant,async function (req, res, next) {
+
+  try {
+    const loginUser = localStorage.getItem('loginUser');
+    const userRole = localStorage.getItem('userRole');
+    const acc = localStorage.getItem('userAcc');
+    if (userRole != 0) {
+      res.redirect('/merchant');
+    }
+
+    // Find all transactions
+    const payments = await transactionModel.find({ mer_acc: acc });
+
+    // Calculate the total number of records
+    const totalRecords = payments.length;
+
+    // Filter payments based on status and calculate the total records for each status
+    const totalRecordsPending = payments.filter(payment => payment.status === 'Pending').length;
+    const totalRecordsPay = payments.filter(payment => payment.status === 'Succeeded').length;
+    const totalRecordsReject = payments.filter(payment => payment.status === 'Reject').length;
+
+    // Calculate the total sum of payments
+    const totalPayments = payments.reduce((total, payment) => total + payment.amount, 0);
+
+    // Calculate the sum of amounts for each type of transaction
+    const sumPendingAmounts = payments.reduce((total, payment) => {
+      if (payment.status === 'Pending') {
+        return total + payment.amount;
+      }
+      return total;
+    }, 0);
+
+    const sumPayAmounts = payments.reduce((total, payment) => {
+      if (payment.status === 'Succeeded') {
+        return total + payment.amount;
+      }
+      return total;
+    }, 0);
+
+    const sumRejectAmounts = payments.reduce((total, payment) => {
+      if (payment.status === 'Reject') {
+        return total + payment.amount;
+      }
+      return total;
+    }, 0);
+    // res.render('dashboard', { title: 'PayHabib', loginUser: loginUser, errors: '', success: '' });
+
+    // Render the view with processed payments data
+    res.render('dashboard', {
+      title: 'dashboard',
+      payments: payments,
+      loginUser: loginUser,
+      totalRecords: totalRecords,
+      totalPayments: totalPayments,
+      totalRecordsPending: totalRecordsPending,
+      totalRecordsPay: totalRecordsPay,
+      totalRecordsReject: totalRecordsReject,
+      sumPendingAmounts: sumPendingAmounts,
+      sumPayAmounts: sumPayAmounts,
+      sumRejectAmounts: sumRejectAmounts,
+      msg: ""
+    });
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    // Handle error appropriately, e.g., render an error page
+    next(error);
+  }
+
 });
 
 router.get('/', function (req, res, next) {

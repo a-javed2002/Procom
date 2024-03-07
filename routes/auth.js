@@ -239,7 +239,7 @@ router.get('/payments', checkLoginUser, function (req, res, next) {
       const totalRecords = payments.length;
 
       const totalRecordsPending = payments.filter(payment => payment.status === 'Pending').length;
-      const totalRecordsPay = payments.filter(payment => payment.status === 'Pay').length;
+      const totalRecordsPay = payments.filter(payment => payment.status === 'Succeeded').length;
       const totalRecordsReject = payments.filter(payment => payment.status === 'Reject').length;
 
       const totalPayments = payments.reduce((total, payment) => total + payment.amount, 0);
@@ -252,7 +252,7 @@ router.get('/payments', checkLoginUser, function (req, res, next) {
       }, 0);
 
       const sumPayAmounts = payments.reduce((total, payment) => {
-        if (payment.status === 'Pay') {
+        if (payment.status === 'Succeeded') {
           return total + payment.amount;
         }
         return total;
@@ -348,7 +348,7 @@ router.post('/pay', checkLoginUser, function (req, res, next) {
     }
 
   // Update the status of the payment
-  transactionModel.findByIdAndUpdate(paymentId, { status: 'Pay' }, { new: true }, function (err, updatedPayment) {
+  transactionModel.findByIdAndUpdate(paymentId, { status: 'Succeeded' }, { new: true }, function (err, updatedPayment) {
     if (err) {
       console.error(err);
       return res.status(500).send('Error updating status');

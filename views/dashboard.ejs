@@ -14,15 +14,18 @@
 
     <link href="/stylesheets/main.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
 <style>
-     .vertical-nav-menu li a.mm-active {
-    color: white;
-    background: #784ee8;
-    font-weight: 700;
-}
+    .vertical-nav-menu li a.mm-active {
+        color: white;
+        background: #784ee8;
+        font-weight: 700;
+    }
 </style>
+
 <body>
     <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
         <div class="app-header header-shadow">
@@ -67,7 +70,9 @@
                             <div class="widget-content-wrapper">
                                 <div class="widget-content-left  ml-3 header-user-info">
                                     <div class="widget-heading">
-                                        <% if(loginUser){ %> <%= loginUser  %> <% } %>
+                                        <% if(loginUser){ %>
+                                            <%= loginUser %>
+                                                <% } %>
                                     </div>
                                     <div class="widget-subheading">
                                         Merchant
@@ -493,7 +498,7 @@
                         <ul class="vertical-nav-menu">
                             <li>
                                 <a href="/merchant/dashboard" class="mm-active">
-                                    <i class="fa fa-file"></i> 
+                                    <i class="fa fa-file"></i>
                                     Dashboard
                                 </a>
                             </li>
@@ -521,7 +526,7 @@
                                     Logout
                                 </a>
                             </li>
-                            
+
                         </ul>
                     </div>
                 </div>
@@ -558,7 +563,32 @@
                                                 <div class="widget-chat-wrapper-outer">
                                                     <div
                                                         class="widget-chart-wrapper widget-chart-wrapper-lg opacity-10 m-0">
-                                                        <canvas id="canvas"></canvas>
+                                                        <!-- <canvas id="canvas"></canvas> -->
+                                                        <canvas id="barChart"></canvas>
+                                                        <script>
+                                                            var ctx = document.getElementById("barChart").getContext('2d');
+                                                            var barChart = new Chart(ctx, {
+                                                                type: 'bar',
+                                                                data: {
+                                                                    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sst", "Sun"],
+                                                                    datasets: [{
+                                                                        label: "Amount Received",
+                                                                        data: [12, 21, 3, 17, 28, 24, 7],
+                                                                        backgroundColor: "rgba(255,0,0,1)"
+                                                                    },
+                                                                     {
+                                                                        label: "Reject",
+                                                                        data: [30, 29, 5, 5, 20, 3, 10],
+                                                                        backgroundColor: "rgba(0,0,255,1)"
+                                                                    }, {
+                                                                        label: "Pending",
+                                                                        data: [22, 10, 5, 5, 11, 7, 4],
+                                                                        backgroundColor: "rgba(0,0,123,1)"
+                                                                    }
+                                                                ]
+                                                                }
+                                                            });
+                                                        </script>
                                                     </div>
                                                 </div>
                                             </div>
@@ -570,11 +600,46 @@
                         <div class="col-md-12 col-lg-6">
                             <div class="main-card mb-3 card">
                                 <div class="card-body">
+                                    <h5 class="card-title">Pie Chart</h5>
+                                    <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                                </div>
+                            </div>
+                            <script>
+                                const xValues = ["Succeeded", "Reject", "Pending"];
+                                const yValues = [<%= sumPayAmounts %>, <%= sumRejectAmounts %>, <%= sumPendingAmounts %>];
+                                const barColors = [
+                                    "#b91d47",
+                                    "#00aba9",
+                                    "#2b5797",
+                                ];
+
+                                new Chart("myChart", {
+                                    type: "pie",
+                                    data: {
+                                        labels: xValues,
+                                        datasets: [{
+                                            backgroundColor: barColors,
+                                            data: yValues
+                                        }]
+                                    },
+                                    options: {
+                                        title: {
+                                            display: true,
+                                            text: "Payments"
+                                        }
+                                    }
+                                });
+                            </script>
+                        </div>
+
+                        <!-- <div class="col-md-12 col-lg-6">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
                                     <h5 class="card-title">Doughnut</h5>
                                     <canvas id="doughnut-chart"></canvas>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
