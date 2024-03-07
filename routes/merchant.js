@@ -270,7 +270,11 @@ router.post('/payments', checkLoginMerchant, checkAccountNo, async function (req
       const wirelessIP = wirelessInterface ? wirelessInterface.address : 'No wireless adapter found';
       console.log(wirelessIP);
 
-      const qrUrl = `http://${wirelessIP}:3000/read?p_id=${newTransaction._id}`;
+      // const qrUrl = `http://${wirelessIP}:3000/read?p_id=${newTransaction._id}`;//main
+      const qrUrl = `https://procom-production.up.railway.app/read?p_id=${newTransaction._id}`;
+
+
+
       // const qrUrl = `http://localhost:3000/read?p_id=${newTransaction._id}`;
       // const qrUrl = `http://localhost:3000/read?cust_name=${cust_name_encoded}&cust_email=${cust_email_encoded}&cust_acc=${cust_acc_encoded}&mer_acc=${mer_acc_encoded}&desc=${desc_encoded}&bank=${bank_encoded}&amount=${amount_encoded}`;
 
