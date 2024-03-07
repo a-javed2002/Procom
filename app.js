@@ -9,16 +9,6 @@ const bodyParser = require('body-parser');
 
 var authRouter = require('./routes/auth');
 var merchantRouter = require('./routes/merchant');
-var dashboardRouter = require('./routes/dashboard');
-var addNewCateRouter = require('./routes/add-new-category');
-var ViewPassCateRouter = require('./routes/passwordCategory');
-var addNewPassRouter = require('./routes/add-new-password');
-var viewAllPassRouter = require('./routes/view-all-password');
-var passwordDetailsRouter = require('./routes/password-detail');
-var joinRouter = require('./routes/join');
-var cartRouter = require('./routes/cart');
-var catRouter = require('./routes/cat');
-var proRouter = require('./routes/pro');
 
 var app = express();
 
@@ -43,17 +33,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', authRouter);
-app.use('/cart', cartRouter);
-app.use('/dashboard', dashboardRouter);
-app.use('/add-new-category', addNewCateRouter);
-app.use('/passwordCategory', ViewPassCateRouter);
-app.use('/add-new-password', addNewPassRouter); 
-app.use('/view-all-password', viewAllPassRouter);
-app.use('/password-detail', passwordDetailsRouter);
 app.use('/merchant', merchantRouter);
-app.use('/join', joinRouter);
-app.use('/category', catRouter);
-app.use('/product', proRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

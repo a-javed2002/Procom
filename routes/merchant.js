@@ -1,14 +1,12 @@
 var express = require('express');
-var userModule = require('../modules/user');
-var passCatModel = require('../modules/password_category');
-var passModel = require('../modules/add_password');
-var transactionModel = require('../modules/transaction');
+var userModule = require('../models/user');
+var transactionModel = require('../models/transaction');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
 const fs = require('fs');
 const qr = require('qrcode');
 const nodemailer = require('nodemailer');
-
+const os = require('os');
 
 
 function checkLoginMerchant(req, res, next) {
@@ -30,19 +28,14 @@ if (typeof localStorage === "undefined" || localStorage === null) {
   localStorage = new LocalStorage('./scratch');
 }
 
-router.get('/dashboard',checkLoginMerchant, function(req, res, next) {
-  var loginUser=localStorage.getItem('loginUser');
+router.get('/dashboard', checkLoginMerchant, function (req, res, next) {
+  var loginUser = localStorage.getItem('loginUser');
   var getuserAcc = localStorage.getItem('userAcc');
-  res.render('dashboard', { title: 'PayHabib',loginUser: loginUser,errors:'',success:'' });
-  });
+  res.render('dashboard', { title: 'PayHabib', loginUser: loginUser, errors: '', success: '' });
+});
 
 router.get('/', function (req, res, next) {
-  var loginUser = localStorage.getItem('loginUser');
-  passModel.countDocuments({}).exec((err, count) => {
-    passCatModel.countDocuments({}).exec((err, countasscat) => {
-      res.render('merchantLogin', { title: 'PayHabib', loginUser: loginUser, msg: '', totalPassword: count, totalPassCat: countasscat });
-    });
-  });
+  res.render('merchantLogin', { title: 'PayHabib', msg: '', });
 });
 
 
@@ -102,7 +95,7 @@ router.get('/users', checkLoginMerchant, async function (req, res, next) {
 });
 
 
-router.get('/payments', checkLoginMerchant, async function(req, res, next) {
+router.get('/payments', checkLoginMerchant, async function (req, res, next) {
   try {
     const loginUser = localStorage.getItem('loginUser');
     const userRole = localStorage.getItem('userRole');
@@ -112,7 +105,7 @@ router.get('/payments', checkLoginMerchant, async function(req, res, next) {
     }
 
     // Find all transactions
-    const payments = await transactionModel.find({mer_acc:acc});
+    const payments = await transactionModel.find({ mer_acc: acc });
 
     // Calculate the total number of records
     const totalRecords = payments.length;
@@ -187,9 +180,9 @@ router.post('/payments', checkLoginMerchant, async function (req, res, next) {
   const { cust_acc, mer_acc, desc, amount, cust_name, cust_email, bank } = req.body;
 
   const userRole = localStorage.getItem('userRole');
-    if(userRole!=0){
+  if (userRole != 0) {
     res.redirect('/merchant');
-    }
+  }
 
   // Assuming transactionModel is your Mongoose model for transactions
   const newTransaction = new transactionModel({
@@ -217,7 +210,30 @@ router.post('/payments', checkLoginMerchant, async function (req, res, next) {
       const bank_encoded = encodeURIComponent(bank);
       const amount_encoded = encodeURIComponent(amount);
 
-      const qrUrl = `http://localhost:3000/read?p_id=${newTransaction._id}`;
+      // Get network interfaces
+      // const networkInterfaces = os.networkInterfaces();
+
+      // // Filter out internal and non-IPv4 addresses
+      // const localIP = Object.keys(networkInterfaces)
+      //   .map(interfaceName => networkInterfaces[interfaceName].find(address => address.family === 'IPv4' && !address.internal))
+      //   .filter(Boolean)[0].address;
+
+      // console.log(localIP);
+
+      // Get network interfaces
+      const networkInterfaces = os.networkInterfaces();
+
+      // Filter out the wireless adapter by name
+      const wirelessInterface = Object.keys(networkInterfaces)
+        .map(interfaceName => networkInterfaces[interfaceName].find(address => !address.internal && address.family === 'IPv4' && interfaceName.includes('Wi-Fi')))
+        .filter(Boolean)[0];
+
+      // Get the IP address if the wireless interface is found
+      const wirelessIP = wirelessInterface ? wirelessInterface.address : 'No wireless adapter found';
+      console.log(wirelessIP);
+
+      const qrUrl = `http://${wirelessIP}:3000/read?p_id=${newTransaction._id}`;
+      // const qrUrl = `http://localhost:3000/read?p_id=${newTransaction._id}`;
       // const qrUrl = `http://localhost:3000/read?cust_name=${cust_name_encoded}&cust_email=${cust_email_encoded}&cust_acc=${cust_acc_encoded}&mer_acc=${mer_acc_encoded}&desc=${desc_encoded}&bank=${bank_encoded}&amount=${amount_encoded}`;
 
       const qrImageData = await generateQR(qrUrl);
@@ -262,9 +278,9 @@ router.post('/payments', checkLoginMerchant, async function (req, res, next) {
 router.get('/create', checkLoginMerchant, function (req, res, next) {
   const loginUser = localStorage.getItem('loginUser');
   const userRole = localStorage.getItem('userRole');
-    if(userRole!=0){
+  if (userRole != 0) {
     res.redirect('/merchant');
-    } 
+  }
   res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '' });
 
 });

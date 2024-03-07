@@ -1,16 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var userModule = require('../modules/user');
-var passCatModel = require('../modules/password_category');
-var passModel = require('../modules/add_password');
+var userModule = require('../models/user');
 var bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-var transactionModel = require('../modules/transaction');
+var transactionModel = require('../models/transaction');
 var jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 
-var getPassCat = passCatModel.find({});
-var getAllPass = passModel.find({});
+
 /* GET home page. */
 
 function checkLoginUser(req, res, next) {
@@ -33,7 +30,14 @@ if (typeof localStorage === "undefined" || localStorage === null) {
 router.get('/', function (req, res, next) {
   var loginUser = localStorage.getItem('loginUser');
   if (loginUser) {
-    res.redirect('./dashboard');
+    const userRole = localStorage.getItem('userRole');
+    if(userRole==0){
+    res.redirect('/merchant/dashboard');
+    }
+    else{
+      res.redirect('/payments');
+    }
+
   } else {
     res.render('login', { title: 'PayHabib', msg: '' });
   }
@@ -80,49 +84,6 @@ router.post('/', function (req, res, next) {
   });
 
 });
-
-// router.get('/sendEmail', checkLoginUser,function(req, res, next) {
-//   var loginUser=localStorage.getItem('loginUser');
-//   passModel.countDocuments({}).exec((err,count)=>{
-//     passCatModel.countDocuments({}).exec((err,countasscat)=>{    
-//   res.render('email', { title: 'PayHabib', loginUser:loginUser,msg:'',totalPassword:count, totalPassCat:countasscat });
-//   });
-// });
-// });
-
-// // Route to handle the form submission and send email
-// router.post('/sendEmail', (req, res) => {
-//   const { email, subject, message } = req.body;
-
-//   // Create a nodemailer transporter
-//   const transporter = nodemailer.createTransport({
-//     service: 'Gmail',
-//     auth: {
-//       user: 'abdjav2002@gmail.com',
-//       pass: 'cram tbhi uhth xzul'
-//     }
-//   });
-
-//   // Email options
-//   const mailOptions = {
-//     from: 'abdjav2002@gmail.com',
-//     to: email,
-//     subject: subject,
-//     text: message
-//   };
-
-//   // Send email
-//   transporter.sendMail(mailOptions, (error, info) => {
-//     if (error) {
-//       console.log(error);
-//       res.send('Error occurred while sending email');
-//     } else {
-//       console.log('Email sent: ' + info.response);
-//       res.send('Email sent successfully');
-//     }
-//   });
-// });
-
 
 
 router.get('/signup', function (req, res, next) {
