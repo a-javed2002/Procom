@@ -182,40 +182,109 @@ router.get('/logout', function (req, res, next) {
 });
 
 
-router.get('/payments', checkLoginUser, function (req, res, next) {
-  const loginUser = localStorage.getItem('loginUser');
-  const userRole = localStorage.getItem('userRole');
-    if(userRole!=1){
-    res.redirect('/merchant');
-    }
-  var getUserID = localStorage.getItem('userID');
-  var getuserAcc = localStorage.getItem('userAcc');
-  transactionModel.find({ cust_acc: getuserAcc }, function (err, payments) {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error fetching payments');
-    } else {
-      // Preprocess the payments data
-      const processedPayments = payments.map(payment => {
-        const dateTime = new Date(payment.date);
-        const properDate = dateTime.toLocaleDateString();
-        const properTime = dateTime.toLocaleTimeString();
+// router.get('/payments', checkLoginUser, function (req, res, next) {
+//   const loginUser = localStorage.getItem('loginUser');
+//   const userRole = localStorage.getItem('userRole');
+//     if(userRole!=1){
+//     res.redirect('/merchant');
+//     }
+//   var getUserID = localStorage.getItem('userID');
+//   var getuserAcc = localStorage.getItem('userAcc');
+//   transactionModel.find({ cust_acc: getuserAcc }, function (err, payments) {
+//     if (err) {
+//       console.error(err);
+//       res.status(500).send('Error fetching payments');
+//     } else {
+//       // Preprocess the payments data
+//       const processedPayments = payments.map(payment => {
+//         const dateTime = new Date(payment.date);
+//         const properDate = dateTime.toLocaleDateString();
+//         const properTime = dateTime.toLocaleTimeString();
 
-        return {
-          ...payment.toObject(), // Convert Mongoose document to plain object
-          properDate: properDate,
-          properTime: properTime
-        };
-      });
+//         return {
+//           ...payment.toObject(), // Convert Mongoose document to plain object
+//           properDate: properDate,
+//           properTime: properTime
+//         };
+//       });
+
+//       // Render the view with processed payments data
+//       res.render('paymentsUsers', {
+//         title: 'Payments',
+//         loginUser: loginUser,
+//         payments: processedPayments
+//       });
+//     }
+//   });
+// });
+
+router.get('/payments', checkLoginUser, function (req, res, next) {
+  try {
+    const loginUser = localStorage.getItem('loginUser');
+    const userRole = localStorage.getItem('userRole');
+
+    if (userRole != 1) {
+      return res.redirect('/merchant');
+    }
+
+    const userAcc = localStorage.getItem('userAcc');
+
+    transactionModel.find({ cust_acc: userAcc }, function (err, payments) {
+      if (err) {
+        console.error('Error fetching payments:', err);
+        return res.status(500).send('Error fetching payments');
+      }
+
+      // Calculate statistics
+      const totalRecords = payments.length;
+
+      const totalRecordsPending = payments.filter(payment => payment.status === 'Pending').length;
+      const totalRecordsPay = payments.filter(payment => payment.status === 'Pay').length;
+      const totalRecordsReject = payments.filter(payment => payment.status === 'Reject').length;
+
+      const totalPayments = payments.reduce((total, payment) => total + payment.amount, 0);
+
+      const sumPendingAmounts = payments.reduce((total, payment) => {
+        if (payment.status === 'Pending') {
+          return total + payment.amount;
+        }
+        return total;
+      }, 0);
+
+      const sumPayAmounts = payments.reduce((total, payment) => {
+        if (payment.status === 'Pay') {
+          return total + payment.amount;
+        }
+        return total;
+      }, 0);
+
+      const sumRejectAmounts = payments.reduce((total, payment) => {
+        if (payment.status === 'Reject') {
+          return total + payment.amount;
+        }
+        return total;
+      }, 0);
 
       // Render the view with processed payments data
       res.render('paymentsUsers', {
         title: 'Payments',
         loginUser: loginUser,
-        payments: processedPayments
+        payments: payments,
+        totalRecords: totalRecords,
+        totalPayments: totalPayments,
+        totalRecordsPending: totalRecordsPending,
+        totalRecordsPay: totalRecordsPay,
+        totalRecordsReject: totalRecordsReject,
+        sumPendingAmounts: sumPendingAmounts,
+        sumPayAmounts: sumPayAmounts,
+        sumRejectAmounts: sumRejectAmounts
       });
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error handling request:', error);
+    // Handle error appropriately, e.g., render an error page
+    next(error);
+  }
 });
 
 
@@ -244,6 +313,10 @@ router.get('/paymentDetail/pay/:id', checkLoginUser, function (req, res, next) {
 
         if(payment.AccountNo == getuserAcc){
           res.status(404).send('You Dont have permisssion to access this');
+        }
+
+        if (payment.status!="Pending") {
+          res.redirect("/payments");
         }
 
         const processedPayment = {
@@ -288,14 +361,14 @@ router.post('/pay', checkLoginUser, function (req, res, next) {
   });
 });
 
-router.get('/reject', checkLoginUser, function (req, res, next) {
+router.get('/reject/:id', checkLoginUser, function (req, res, next) {
   
   const userRole = localStorage.getItem('userRole');
     if(userRole!=1){
     res.redirect('/merchant');
     }
   const loginUser = localStorage.getItem('loginUser');
-  const { paymentId } = req.body;
+  const paymentId = req.params.id;
 
   // Update the status of the payment
   transactionModel.findByIdAndUpdate(paymentId, { status: 'Reject' }, { new: true }, function (err, updatedPayment) {

@@ -180,19 +180,22 @@ router.post('/payments', checkLoginMerchant, async function (req, res, next) {
   const { cust_acc, mer_acc, desc, amount, cust_name, cust_email, bank } = req.body;
 
   const userRole = localStorage.getItem('userRole');
+  const userAcc = localStorage.getItem('userAcc');
   if (userRole != 0) {
     res.redirect('/merchant');
   }
-
+  const dateTime = new Date();
   // Assuming transactionModel is your Mongoose model for transactions
   const newTransaction = new transactionModel({
     cust_name: cust_name,
     cust_email: cust_email,
     cust_acc: cust_acc,
-    mer_acc: mer_acc,
+    mer_acc: userAcc,
     bank: bank,
     desc: desc,
     amount: amount,
+    date : dateTime.toLocaleDateString(),
+    time : dateTime.toLocaleTimeString()
   });
 
   try {
@@ -278,10 +281,11 @@ router.post('/payments', checkLoginMerchant, async function (req, res, next) {
 router.get('/create', checkLoginMerchant, function (req, res, next) {
   const loginUser = localStorage.getItem('loginUser');
   const userRole = localStorage.getItem('userRole');
+  const userAcc = localStorage.getItem('userAcc');
   if (userRole != 0) {
     res.redirect('/merchant');
   }
-  res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '' });
+  res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '',merAcc:userAcc });
 
 });
 

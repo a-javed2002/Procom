@@ -1,130 +1,295 @@
-<!-- Index.html file -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>QR Code Scanner / Reader
-    </title>
-</head>
-<style>
-    /* style.css file*/
-    body {
-        display: flex;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        box-sizing: border-box;
-        text-align: center;
-        background: rgb(128 0 0 / 66%);
-    }
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
 
-    .container {
-        width: 100%;
-        max-width: 500px;
-        margin: 5px;
-    }
+    <title>HabibPay-Payments</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta name="description" content="This is an example dashboard created using build-in elements and components.">
+    <meta name="msapplication-tap-highlight" content="no">
 
-    .container h1 {
-        color: #ffffff;
-    }
+    <link href="/stylesheets/main.css" rel="stylesheet">
 
-    .section {
-        background-color: #ffffff;
-        padding: 50px 30px;
-        border: 1.5px solid #b2b2b2;
-        border-radius: 0.25em;
-        box-shadow: 0 20px 25px rgba(0, 0, 0, 0.25);
-    }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    #my-qr-reader {
-        padding: 20px !important;
-        border: 1.5px solid #b2b2b2 !important;
-        border-radius: 8px;
-    }
-
-    #my-qr-reader img[alt="Info icon"] {
-        display: none;
-    }
-
-    #my-qr-reader img[alt="Camera based scan"] {
-        width: 100px !important;
-        height: 100px !important;
-    }
-
-    button {
-        padding: 10px 20px;
-        border: 1px solid #b2b2b2;
-        outline: none;
-        border-radius: 0.25em;
-        color: white;
-        font-size: 15px;
-        cursor: pointer;
-        margin-top: 15px;
-        margin-bottom: 10px;
-        background-color: #008000ad;
-        transition: 0.3s background-color;
-    }
-
-    button:hover {
-        background-color: #008000;
-    }
-
-    #html5-qrcode-anchor-scan-type-change {
-        text-decoration: none !important;
-        color: #1d9bf0;
-    }
-
-    video {
-        width: 100% !important;
-        border: 1px solid #b2b2b2 !important;
-        border-radius: 0.25em;
-    }
-</style>
-
-<body>
-    <div class="container">
-        <h1>Scan QR Codes</h1>
-        <div class="section">
-            <div id="my-qr-reader">
-            </div>
-        </div>
-    </div>
-    <script src="https://unpkg.com/html5-qrcode">
-    </script>
-    <script>
-        // script.js file
-
-        function domReady(fn) {
-            if (
-                document.readyState === "complete" ||
-                document.readyState === "interactive"
-            ) {
-                setTimeout(fn, 1000);
-            } else {
-                document.addEventListener("DOMContentLoaded", fn);
-            }
+    <title>Payments List</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <style>
+        *,
+        *:after,
+        *:before {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
         }
 
-        domReady(function () {
+        .vertical-nav-menu li a.mm-active {
+            color: white;
+            background: #79dafa;
+            font-weight: 700;
+        }
 
-            // If found you qr code
-            function onScanSuccess(decodeText, decodeResult) {
-                // alert("You Qr is : " + decodeText, decodeResult);
-                window.location.href = decodeText;
-            }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+    </style>
+    <style>
+    
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 5px;
+        }
+    
+        .container h1 {
+            color: #ffffff;
+        }
+    
+        .section {
+            background-color: #ffffff;
+            padding: 50px 30px;
+            border: 1.5px solid #b2b2b2;
+            border-radius: 0.25em;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.25);
+        }
+    
+        #my-qr-reader {
+            padding: 20px !important;
+            border: 1.5px solid #b2b2b2 !important;
+            border-radius: 8px;
+        }
+    
+        #my-qr-reader img[alt="Info icon"] {
+            display: none;
+        }
+    
+        #my-qr-reader img[alt="Camera based scan"] {
+            width: 100px !important;
+            height: 100px !important;
+        }
+    
+        button {
+            padding: 10px 20px;
+            border: 1px solid #b2b2b2;
+            outline: none;
+            border-radius: 0.25em;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            background-color: #008000ad;
+            transition: 0.3s background-color;
+        }
+    
+        button:hover {
+            background-color: #008000;
+        }
+    
+        #html5-qrcode-anchor-scan-type-change {
+            text-decoration: none !important;
+            color: #1d9bf0;
+        }
+    
+        video {
+            width: 100% !important;
+            border: 1px solid #b2b2b2 !important;
+            border-radius: 0.25em;
+        }
+    </style>    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
 
-            let htmlscanner = new Html5QrcodeScanner(
-                "my-qr-reader",
-                { fps: 10, qrbos: 250 }
-            );
-            htmlscanner.render(onScanSuccess);
-        });
+<body>
+    <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
+        <div class="app-header header-shadow">
+            <div class="app-header__logo">
+                <img src="/images/logo.png" alt="" width="50px" height="50px">
+                <!-- <div class="logo-src">
+                </div> -->
+                <div class="header__pane ml-auto">
+                    <div>
+                        <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                            data-class="closed-sidebar">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="app-header__mobile-menu">
+                <div>
+                    <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="app-header__menu">
+                <span>
+                    <button type="button"
+                        class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                        <span class="btn-icon-wrapper">
+                            <i class="fa fa-ellipsis-v fa-w-6"></i>
+                        </span>
+                    </button>
+                </span>
+            </div>
+            <div class="app-header__content">
+                <div class="app-header-right">
+                    <div class="header-btn-lg pr-0">
+                        <div class="widget-content p-0">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left  ml-3 header-user-info">
+                                    <div class="widget-heading">
+                                        <% if(loginUser){ %>
+                                            <%= loginUser %>
+                                                <% } %>
+                                    </div>
+                                    <div class="widget-subheading">
+                                        Merchant
+                                    </div>
+                                </div>
+                                <div class="widget-content-right header-user-info ml-3">
+                                    <button type="button"
+                                        class="btn-shadow p-1 btn btn-primary btn-sm show-toastr-example">
+                                        <i class="fa text-white fa-calendar pr-1 pl-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-main">
+            <div class="app-sidebar sidebar-shadow">
+                <div class="app-header__logo">
+                    <div class="logo-src"></div>
+                    <div class="header__pane ml-auto">
+                        <div>
+                            <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                                data-class="closed-sidebar">
+                                <span class="hamburger-box">
+                                    <span class="hamburger-inner"></span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-header__mobile-menu">
+                    <div>
+                        <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="app-header__menu">
+                    <span>
+                        <button type="button"
+                            class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                            <span class="btn-icon-wrapper">
+                                <i class="fa fa-ellipsis-v fa-w-6"></i>
+                            </span>
+                        </button>
+                    </span>
+                </div>
+                <div class="scrollbar-sidebar">
+                    <div class="app-sidebar__inner">
+                        <ul class="vertical-nav-menu">
+                            <li>
+                                <a href="/payments">
+                                    <i class="fa fa-dollar"></i>
+                                    Payments
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/upload" class="mm-active">
+                                    <i class="fa fa-users"></i>
+                                    QR Scan
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/logout">
+                                    <i class="fa fa-sign-out"></i>
+                                    Logout
+                                </a>
+                            </li>
 
-    </script>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="app-main__outer">
+                <div class="app-main__inner">
+                    <div class="app-page-title">
+                        <div class="page-title-wrapper">
+                            <div class="page-title-heading">
+                                
+                                <div>Scan QR
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="container">
+                            <div class="section">
+                                <div id="my-qr-reader">
+                                </div>
+                            </div>
+                        </div>
+                        <script src="https://unpkg.com/html5-qrcode">
+                        </script>
+                        <script>
+                            // script.js file
+
+                            function domReady(fn) {
+                                if (
+                                    document.readyState === "complete" ||
+                                    document.readyState === "interactive"
+                                ) {
+                                    setTimeout(fn, 1000);
+                                } else {
+                                    document.addEventListener("DOMContentLoaded", fn);
+                                }
+                            }
+
+                            domReady(function () {
+
+                                // If found you qr code
+                                function onScanSuccess(decodeText, decodeResult) {
+                                    // alert("You Qr is : " + decodeText, decodeResult);
+                                    window.location.href = decodeText;
+                                }
+
+                                let htmlscanner = new Html5QrcodeScanner(
+                                    "my-qr-reader",
+                                    { fps: 10, qrbos: 250 }
+                                );
+                                htmlscanner.render(onScanSuccess);
+                            });
+
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <script src="https://maps.google.com/maps/api/js?sensor=true"></script>
+        </div>
+    </div>
+    <script type="text/javascript" src="/javascripts/main.js"></script>
 </body>
 
 </html>
