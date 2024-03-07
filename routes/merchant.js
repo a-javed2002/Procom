@@ -182,7 +182,8 @@ function checkAccountNo(req, res, next) {
   const loginUser = localStorage.getItem('loginUser');
   const userAcc = localStorage.getItem('userAcc');
   var acc = req.body.cust_acc;
-  var checkExistingAccount = transactionModel.findOne({ cust_acc: acc });
+  console.log(acc);
+  var checkExistingAccount = userModule.findOne({ AccountNo: acc });
 
   checkExistingAccount.exec((err, data) => {
     if (err) {
@@ -190,11 +191,13 @@ function checkAccountNo(req, res, next) {
       return res.status(500).send('Internal Server Error');
     }
 
+    console.log(data);
+
     if (!data) {
       // If account does not exist, render a message or redirect
       return res.render('create', {
         title: 'PayHabib',
-        msg: 'Customer Account Does Not Found',
+        msg: 'Customer Account Not Found',
         status: false,
         loginUser:loginUser,
         merAcc:userAcc,
