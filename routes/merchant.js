@@ -63,27 +63,32 @@ router.get('/users', checkLoginMerchant, async function (req, res, next) {
     const acc = localStorage.getItem('userAcc');
 
     if (userRole != 0) {
-      res.redirect('/merchant');
+      return res.redirect('/merchant');
     }
 
     console.log(acc);
 
-    // Fetch users whose account number matches in transactions
-    const users = await userModule.aggregate([
-      {
-        $lookup: {
-          from: "transactions",
-          localField: "AccountNo",
-          foreignField: "mer_acc",
-          as: "transactions"
+    // Fetch transactions that have mer_acc matching acc
+    const transactions = await transactionModel.find({ mer_acc: acc });
+
+    // Array to hold users
+    let users = [];
+
+    // Iterate through transactions and fetch users with matching AccountNo
+    for (const transaction of transactions) {
+      var count = 0;
+      const user = await userModule.findOne({ AccountNo: transaction.cust_acc });
+      if (user) {
+        for (const x of users) {
+          if (x.AccountNo == user.AccountNo) {
+            count++;
+          }
         }
-      },
-      {
-        $match: {
-          "transactions.mer_acc": acc
+        if (count == 0) {
+          users.push(user);
         }
       }
-    ]);
+    }
 
     // Render the view with filtered user data
     res.render('users', { title: 'List of Users', loginUser: loginUser, userss: users });
@@ -93,6 +98,48 @@ router.get('/users', checkLoginMerchant, async function (req, res, next) {
     next(error);
   }
 });
+
+
+
+
+// router.get('/users', checkLoginMerchant, async function (req, res, next) {
+//   try {
+//     const loginUser = localStorage.getItem('loginUser');
+//     const userRole = localStorage.getItem('userRole');
+//     const acc = localStorage.getItem('userAcc');
+
+//     if (userRole != 0) {
+//       return res.redirect('/merchant');
+//     }
+
+//     console.log(acc);
+
+//     // Fetch users whose account number matches in transactions
+//     const users = await userModule.aggregate([
+//       {
+//         $lookup: {
+//           from: "transactions",
+//           localField: "AccountNo",
+//           foreignField: "mer_acc",
+//           as: "transactions"
+//         }
+//       },
+//       {
+//         $match: {
+//           "transactions.mer_acc": acc
+//         }
+//       }
+//     ]);
+
+//     // Render the view with filtered user data
+//     res.render('users', { title: 'List of Users', loginUser: loginUser, userss: users });
+//   } catch (error) {
+//     console.error('Error fetching users:', error);
+//     // Handle error appropriately, e.g., render an error page
+//     next(error);
+//   }
+// });
+
 
 
 router.get('/payments', checkLoginMerchant, async function (req, res, next) {
@@ -112,7 +159,7 @@ router.get('/payments', checkLoginMerchant, async function (req, res, next) {
 
     // Filter payments based on status and calculate the total records for each status
     const totalRecordsPending = payments.filter(payment => payment.status === 'Pending').length;
-    const totalRecordsPay = payments.filter(payment => payment.status === 'Pay').length;
+    const totalRecordsPay = payments.filter(payment => payment.status === 'Succeeded').length;
     const totalRecordsReject = payments.filter(payment => payment.status === 'Reject').length;
 
     // Calculate the total sum of payments
@@ -127,7 +174,7 @@ router.get('/payments', checkLoginMerchant, async function (req, res, next) {
     }, 0);
 
     const sumPayAmounts = payments.reduce((total, payment) => {
-      if (payment.status === 'Pay') {
+      if (payment.status === 'Succeeded') {
         return total + payment.amount;
       }
       return total;
@@ -153,7 +200,7 @@ router.get('/payments', checkLoginMerchant, async function (req, res, next) {
       sumPendingAmounts: sumPendingAmounts,
       sumPayAmounts: sumPayAmounts,
       sumRejectAmounts: sumRejectAmounts,
-      msg:""
+      msg: ""
     });
   } catch (error) {
     console.error('Error fetching payments:', error);
@@ -199,8 +246,8 @@ function checkAccountNo(req, res, next) {
         title: 'PayHabib',
         msg: 'Customer Account Not Found',
         status: false,
-        loginUser:loginUser,
-        merAcc:userAcc,
+        loginUser: loginUser,
+        merAcc: userAcc,
         input: { uname: req.body.uname, email: req.body.email, }
       });
     }
@@ -324,7 +371,7 @@ router.get('/create', checkLoginMerchant, function (req, res, next) {
   if (userRole != 0) {
     res.redirect('/merchant');
   }
-  res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '', merAcc: userAcc ,msg:""});
+  res.render('create', { title: 'Create Payment', loginUser: loginUser, errors: '', success: '', merAcc: userAcc, msg: "" });
 
 });
 
